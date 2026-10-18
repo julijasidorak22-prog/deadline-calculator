@@ -55,6 +55,7 @@
   margin: 0 auto;
   padding: 0 16px 40px;
   display: grid;
+  align-content: start; /* иначе строки грида растягиваются на всю высоту .main */
   gap: 24px;
 }
 

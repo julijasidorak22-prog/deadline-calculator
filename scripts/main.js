@@ -74,7 +74,18 @@ form.addEventListener("submit", (evt) => {
   // 2. Считаем
   const type = getDeadlineType(typeSelect.value);
   const startDate = parseInputDate(dateInput.value);
-  const result = calculateDeadline(startDate, type);
+  // try/catch ловит ошибку в коде расчёта (например, не подключён файл)
+  // и показывает её на странице, а не молча «ломает» кнопку.
+  let result;
+  try {
+    result = calculateDeadline(startDate, type);
+  } catch (err) {
+    console.error(err);
+    showError(
+      `Ошибка в коде расчёта: ${err.message}. Подробности — в консоли (F12).`,
+    );
+    return;
+  }
 
   // 3. Защита: в data.js указана неизвестная единица
   if (!result) {
@@ -84,7 +95,8 @@ form.addEventListener("submit", (evt) => {
 
   // 4. Собираем пояснение
   const period = `${type.amount} ${unitLabels[type.unit]}`;
-  let note = `${period} с ${formatDate(startDate)}. Основание: ${type.basis}.`;
+  // formatDate уже заканчивается на «г.», поэтому после даты ставим «;», а не точку
+  let note = `${period} с ${formatDate(startDate)}; основание: ${type.basis}.`;
 
   // Даты сравниваем через getTime() — число миллисекунд.
   // Сравнивать сами объекты через !== нельзя: это два разных объекта,
